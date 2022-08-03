@@ -1,0 +1,14 @@
+##################################
+INSTRUÇÕES PARA UTILIZAR O DATASET
+##################################
+
+1° -	Renomear o diretório "dataset - Instruções" para "dataset".
+
+2° -	Remover todos os arquivos ".txt" de dentro dos diretórios
+	dataset\[test, new, analise, train, validation].
+
+3° -	Ainda dentro de dataset\[test, train, validation] entrar nos
+	diretórios [down_forest, ground, others, pasture, agriculture, transition, up_forest, water]
+	e remover todos os arquivos ".txt".
+
+4° -	FIM DESTA ETAPA

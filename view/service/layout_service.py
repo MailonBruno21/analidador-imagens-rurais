@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 from pickle import FALSE
 import shutil
 import tkinter as tk
@@ -13,6 +14,7 @@ from PyQt5.QtWidgets import QMainWindow
 
 from backend.service import image_service as ims
 from backend.service import rede_neural as rn
+from backend.service import arquivos_do_sistema as ads
 
 
 class Layout_service:
@@ -21,70 +23,69 @@ class Layout_service:
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.main_win)
 
-        #-- MAPEANDO OS BOTÕES DO MENU DO HEADER
+        # -- MAPEANDO OS BOTÕES DO MENU DO HEADER
         self.ui.pushButton_analizar.clicked.connect(self.analisar_header)
         self.ui.pushButton_imagem.clicked.connect(self.imagem_header)
-        
 
         #######################################
-        #-- MAPEANDO OS BOTÕES DO MENU ANALISAR
+        # -- MAPEANDO OS BOTÕES DO MENU ANALISAR
         #######################################
         self.ui.pushButton_load_cortar.clicked.connect(self.cortar)
         self.ui.pushButton_analisar_img.clicked.connect(self.analisar)
         self.ui.pushButton_relatorio.clicked.connect(self.relatorio)
         self.ui.pushButton_home_analisar.clicked.connect(self.show)
 
-
         #######################################
-        #-- MAPEANDO OS BOTÕES DO MENU IMAGEM
+        # -- MAPEANDO OS BOTÕES DO MENU IMAGEM
         #######################################
         self.ui.pushButton_aplic_filtros.clicked.connect(self.filtros)
         self.ui.pushButton_abrir_imagem.clicked.connect(self.imagem_header)
         self.ui.pushButton_voltar_img.clicked.connect(self.show)
 
         ###################################################
-        #-- MAPEANDO OS BOTÕES DA PAGINA ANALISAR -> CORTAR
+        # -- MAPEANDO OS BOTÕES DA PAGINA ANALISAR -> CORTAR
         ###################################################
-        self.ui.pushButton_busca_cortar.clicked.connect(self.buscar_imagem_no_sistema)
+        self.ui.pushButton_busca_cortar.clicked.connect(
+            self.buscar_imagem_no_sistema)
         self.ui.pushButton_abrir_cortar.clicked.connect(self.abrir_imagem)
-        self.ui.radioButton_dataset.clicked.connect(self.cotar_img_radion_button)
-        self.ui.radioButton_analise.clicked.connect(self.cotar_img_radion_button)
+        self.ui.radioButton_dataset.clicked.connect(
+            self.cotar_img_radion_button)
+        self.ui.radioButton_analise.clicked.connect(
+            self.cotar_img_radion_button)
         self.ui.pushButton_proximo.clicked.connect(self.proxima_imagem)
         self.ui.pushButton_anterior.clicked.connect(self.anterior_imagem)
         self.ui.pushButton_salvar_cut.clicked.connect(self.recortar_imagem)
 
         ###################################################
-        #-- MAPEANDO OS BOTÕES DA PAGINA ANALISAR -> ANALISAR
+        # -- MAPEANDO OS BOTÕES DA PAGINA ANALISAR -> ANALISAR
         ###################################################
         self.ui.pushButton_treinar_novo_modelo.clicked.connect(self.treinar)
-        
 
-   
-        
-    #-- MAPEANDO AS FUNÇÕES DO MENU DO HEADER
+    # -- MAPEANDO AS FUNÇÕES DO MENU DO HEADER
+
     def analisar_header(self):
-        self.ui.stackedWidget_Analise.setCurrentWidget(self.ui.page_analisar_imagem)
+        self.ui.stackedWidget_Analise.setCurrentWidget(
+            self.ui.page_analisar_imagem)
         self.ui.stackedWidget_analisar.setCurrentWidget(self.ui.page_analisar)
 
     def imagem_header(self):
         self.ui.stackedWidget_2.setCurrentWidget(self.ui.abrir_imagem)
         self.ui.stackedWidget_analisar.setCurrentWidget(self.ui.page_imagens)
-    
 
-    #-- MAPEANDO AS FUNÇÕES DA HOME
+    # -- MAPEANDO AS FUNÇÕES DA HOME
+
     def show(self):
         self.ui.stackedWidget_analisar.setCurrentWidget(self.ui.page_main)
         self.main_win.show()
-    
 
-    #-- MAPEANDO AS FUNÇÕES DO MENU ANALISAR
+    # -- MAPEANDO AS FUNÇÕES DO MENU ANALISAR
+
     def cortar(self):
 
         filename = os.listdir("backend/image/cache")
 
         for a in filename:
             os.remove("backend/image/cache/"+str(a))
-
 
         self.ui.radioButton_analise.setChecked(True)
 
@@ -102,72 +103,77 @@ class Layout_service:
             self.ui.lineEdit_altura.setEnabled(True)
             self.ui.lineEdit_espacamento.setEnabled(True)
 
-        self.ui.stackedWidget_Analise.setCurrentWidget(self.ui.page_cortar_imagem)
+        self.ui.stackedWidget_Analise.setCurrentWidget(
+            self.ui.page_cortar_imagem)
         self.ui.stackedWidget_analisar.setCurrentWidget(self.ui.page_analisar)
 
     def analisar(self):
-        self.ui.stackedWidget_Analise.setCurrentWidget(self.ui.page_analisar_imagem)
+        self.ui.stackedWidget_Analise.setCurrentWidget(
+            self.ui.page_analisar_imagem)
         self.ui.stackedWidget_analisar.setCurrentWidget(self.ui.page_analisar)
-    
+
     def relatorio(self):
-        self.ui.stackedWidget_Analise.setCurrentWidget(self.ui.page_montar_imagem)
+        self.ui.stackedWidget_Analise.setCurrentWidget(
+            self.ui.page_montar_imagem)
         self.ui.stackedWidget_analisar.setCurrentWidget(self.ui.page_analisar)
 
+    # -- MAPEANDO AS FUNÇÕES DO MENU IMAGEM
 
-    #-- MAPEANDO AS FUNÇÕES DO MENU IMAGEM
     def filtros(self):
         self.ui.stackedWidget_2.setCurrentWidget(self.ui.aplicar_filtros)
         self.ui.stackedWidget_analisar.setCurrentWidget(self.ui.page_imagens)
 
-
-    #-- MAPEANDO AS FUNÇÕES DA PAGINA ANALISAR -> ANALISAR
-
+    # -- MAPEANDO AS FUNÇÕES DA PAGINA ANALISAR -> ANALISAR
 
     #####################################################
-    ##-- MAPEANDO AS FUNÇÕES DA PAGINA ANALISAR -> CORTAR
+    # -- MAPEANDO AS FUNÇÕES DA PAGINA ANALISAR -> CORTAR
     #####################################################
+
     def buscar_imagem_no_sistema(self):
         root = tk.Tk()
         root.withdraw()
         file_path = filedialog.askopenfilenames()
         num = 1
-        for a in file_path:
 
-            path_interna = "backend/image/cache/imagem_selecionada_"+str(num)+".jpg"
-            print(a)
-            shutil.copy(a, path_interna)
-            num = num + 1
-            time.sleep(0.5)
+        if file_path != '':
+            for a in file_path:
 
-        self.ui.label_num_fotos.setText("1")
-        self.ui.lineEdit_cortar_img.setText(str(file_path[0]))
-        self.ui.label_img_cut.setPixmap(QtGui.QPixmap(str(file_path[0])))
-        
-        filename = os.listdir("backend/image/cache")
-        caminho = str(filename[0])
-        img = ims.carregar_imagem("backend/image/cache/" + caminho, 2)
-        self.ui.label_largura_cut.setText(str(img.shape[1]))
-        self.ui.label_altura_cut.setText(str(img.shape[0]))
-         
+                path_interna = "backend/image/cache/imagem_selecionada_" + \
+                    str(num)+".jpg"
+                print(a)
+                shutil.copy(a, path_interna)
+                num = num + 1
+                time.sleep(0.5)
+
+            self.ui.label_num_fotos.setText("1")
+            self.ui.lineEdit_cortar_img.setText(str(file_path[0]))
+            self.ui.label_img_cut.setPixmap(QtGui.QPixmap(str(file_path[0])))
+
+            filename = os.listdir("backend/image/cache")
+            caminho = str(filename[0])
+            img = ims.carregar_imagem("backend/image/cache/" + caminho, 2)
+            self.ui.label_largura_cut.setText(str(img.shape[1]))
+            self.ui.label_altura_cut.setText(str(img.shape[0]))
+
     def abrir_imagem(self):
 
         filename = os.listdir("backend/image/cache")
-        #FUNCAO DE CARREGAR A IMAGEM
+        # FUNCAO DE CARREGAR A IMAGEM
         caminho = str(filename[0])
         print(filename)
         img = ims.carregar_imagem("backend/image/cache/" + caminho, 2)
         self.ui.label_largura_cut.setText(str(img.shape[1]))
         self.ui.label_altura_cut.setText(str(img.shape[0]))
-       
+
     def proxima_imagem(self):
         filename = os.listdir("backend/image/cache")
         qtd_file = 0
         for a in filename:
             qtd_file = qtd_file + 1
-        #FUNCAO DE CARREGAR A IMAGEM
+        # FUNCAO DE CARREGAR A IMAGEM
         a = self.ui.label_num_fotos.text()
         a = int(a)
-        
+
         print(qtd_file)
         print("proxima")
         print(a)
@@ -176,16 +182,17 @@ class Layout_service:
             caminho = str(filename[a-1])
             img = ims.carregar_imagem("backend/image/cache/" + caminho, 2)
 
-            self.ui.label_img_cut.setPixmap(QtGui.QPixmap("backend/image/cache/" + caminho))
+            self.ui.label_img_cut.setPixmap(
+                QtGui.QPixmap("backend/image/cache/" + caminho))
             self.ui.label_largura_cut.setText(str(img.shape[1]))
             self.ui.label_altura_cut.setText(str(img.shape[0]))
-            
+
             self.ui.label_num_fotos.setText(str(a))
-    
+
     def anterior_imagem(self):
         filename = os.listdir("backend/image/cache")
-        
-        #FUNCAO DE CARREGAR A IMAGEM
+
+        # FUNCAO DE CARREGAR A IMAGEM
         a = self.ui.label_num_fotos.text()
         a = int(a)
 
@@ -196,10 +203,11 @@ class Layout_service:
             caminho = str(filename[a-1])
             img = ims.carregar_imagem("backend/image/cache/" + caminho, 2)
 
-            self.ui.label_img_cut.setPixmap(QtGui.QPixmap("backend/image/cache/" + caminho))
+            self.ui.label_img_cut.setPixmap(
+                QtGui.QPixmap("backend/image/cache/" + caminho))
             self.ui.label_largura_cut.setText(str(img.shape[1]))
             self.ui.label_altura_cut.setText(str(img.shape[0]))
-            
+
             self.ui.label_num_fotos.setText(str(a))
 
     def cotar_img_radion_button(self):
@@ -217,31 +225,46 @@ class Layout_service:
             self.ui.lineEdit_largura.setEnabled(True)
             self.ui.lineEdit_altura.setEnabled(True)
             self.ui.lineEdit_espacamento.setEnabled(True)
-    
+
     def recortar_imagem(self):
         linha = self.ui.lineEdit_largura.text()
         coluna = self.ui.lineEdit_altura.text()
         espacamento = self.ui.lineEdit_espacamento.text()
 
-        
-
         var = self.ui.radioButton_analise.isChecked()
 
-        total_fotos = ims.start_recortar_imagens(linha,coluna,espacamento, var)
+        total_fotos = ims.start_recortar_imagens(
+            linha, coluna, espacamento, var)
 
         self.ui.label_tota_fotos_num.setText(str(total_fotos))
 
+    #######################################################
+    # -- MAPEANDO AS FUNÇÕES DA PAGINA ANALISAR -> ANALISAR
+    #######################################################
 
-    #######################################################
-    ##-- MAPEANDO AS FUNÇÕES DA PAGINA ANALISAR -> ANALISAR
-    #######################################################
     def treinar(self):
+        
         altura = self.ui.lineEdit_altura_novo_modelo.text()
         largura = self.ui.lineEdit_largura_novo_modelo.text()
-        rn.treinar_rede_neural(int(altura), int(largura))
+        root = tk.Tk()
+        root.withdraw()
+        caminho = filedialog.askdirectory()
 
+        if caminho != '':
+            caminho = caminho +"/"+ self.ui.lineEdit_nome_do_modelo.text() + ".h5"
+            print(caminho)
+            registros_da_RNC = rn.treinar_rede_neural(int(altura), int(largura), caminho)
 
-    
-    
+            acc = registros_da_RNC.history['accuracy']
+            val_acc = registros_da_RNC.history['val_accuracy']
+            loss = registros_da_RNC.history['loss']
+            val_loss = registros_da_RNC.history['val_loss']
 
+            self.ui.label_acuracia_validacao.setText(str(f'{(acc[0] * 100):.2f}%'))
+            self.ui.label_acuracia_treino.setText(str(f'{(val_acc[0] * 100):.2f}%'))
+            self.ui.label_erro_validacao.setText(str(f'{(loss[0] * 100):.2f}%'))
+            self.ui.label_erro_treino.setText(str(f'{(val_loss[0] * 100):.2f}%'))
+
+        
+        
 

@@ -63,9 +63,9 @@ def carregar_imagens_dataframe(folder: str, categories, filenames, name_folder):
                 os.rename(old_name_img, new_name_img)
             qtd_img_train = qtd_img_train + 1
             categories.append(4)
-        elif(name_folder == 'soy'):
+        elif(name_folder == 'agriculture'):
             
-            new_name_img = folder +'\\img_soy_'+str(qtd_img_train) + '.png'
+            new_name_img = folder +'\\img_agriculture_'+str(qtd_img_train) + '.png'
             if('img_soy_'+str(qtd_img_train) + '.png' != filename):
                 os.rename(old_name_img, new_name_img)
             qtd_img_train = qtd_img_train + 1
@@ -85,7 +85,7 @@ def carregar_imagens_dataframe(folder: str, categories, filenames, name_folder):
             qtd_img_train = qtd_img_train + 1
             categories.append(7)
         
-        print("Aquiiii")
+        print(new_name_img)
         filenames.append(new_name_img)
 
 #qtd_retorno = 0 - Retorna tudo
@@ -98,7 +98,6 @@ def local_do_dataset(qtd_retorno):
     #Dataset Local
     base_dir = 'dataset'
     
-
     # 1 - loading data
     train_dir = os.path.join(base_dir, 'train')
     validation_dir = os.path.join(base_dir, 'validation')
@@ -111,7 +110,7 @@ def local_do_dataset(qtd_retorno):
     # Directory with our training forest/noforest pictures
     train_up_forest_dir = os.path.join(train_dir, 'up_forest')
     train_down_forest_dir = os.path.join(train_dir, 'down_forest')
-    train_soy_dir = os.path.join(train_dir, 'soy')
+    train_soy_dir = os.path.join(train_dir, 'agriculture')
     train_pasture_dir = os.path.join(train_dir, 'pasture')
     train_ground_dir = os.path.join(train_dir, 'ground')
     train_water_dir = os.path.join(train_dir, 'water')
@@ -123,7 +122,7 @@ def local_do_dataset(qtd_retorno):
     # Directory with our validation forest/noforest pictures
     validation_up_forest_dir = os.path.join(validation_dir, 'up_forest')
     validation_down_forest_dir = os.path.join(validation_dir, 'down_forest')
-    validation_soy_dir = os.path.join(validation_dir, 'soy')
+    validation_soy_dir = os.path.join(validation_dir, 'agriculture')
     validation_pasture_dir = os.path.join(validation_dir, 'pasture')
     validation_ground_dir= os.path.join(validation_dir, 'ground')
     validation_water_dir = os.path.join(validation_dir, 'water')
@@ -146,7 +145,7 @@ def local_do_dataset(qtd_retorno):
     filenames = []
     carregar_imagens_dataframe(train_up_forest_dir, categories, filenames, "up_forest")
     carregar_imagens_dataframe(train_down_forest_dir, categories, filenames, "down_forest")
-    carregar_imagens_dataframe(train_soy_dir, categories, filenames, "soy")
+    carregar_imagens_dataframe(train_soy_dir, categories, filenames, "agriculture")
     carregar_imagens_dataframe(train_pasture_dir, categories, filenames, "pasture")
     carregar_imagens_dataframe(train_ground_dir, categories, filenames, "ground")
     carregar_imagens_dataframe(train_water_dir, categories, filenames, "water")
@@ -213,7 +212,7 @@ def rede_neural_convolucinal(show_sumary, image_width, image_height, img_color):
         tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
         tf.keras.layers.MaxPooling2D(2, 2),
 
-        tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
+        tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
         tf.keras.layers.MaxPooling2D(2, 2),
 
 
@@ -221,8 +220,7 @@ def rede_neural_convolucinal(show_sumary, image_width, image_height, img_color):
         tf.keras.layers.Flatten(),
 
         # 512 neuron hidden layer
-        
-        
+           
         tf.keras.layers.Dense(512, activation='relu'),
         # Only 1 output neuron. It will contain a value from 0-1 where 0 for 1 class ('cats')
         # and 1 for the other ('dogs')
@@ -235,14 +233,11 @@ def rede_neural_convolucinal(show_sumary, image_width, image_height, img_color):
     model.compile(optimizer=RMSprop(learning_rate=0.0001),
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])
-
-   
-
     return model
 
-def treinar_rede_neural(altura, largura):
-    model = rede_neural_convolucinal(1, largura, altura, 3)
+def treinar_rede_neural(altura, largura, caminho):
 
+    model = rede_neural_convolucinal(1, largura, altura, 3)
     
     #Desligar Callback no model.fit ainda não compreendo bem o funcionamento
     # my_callbacks = [
@@ -261,15 +256,15 @@ def treinar_rede_neural(altura, largura):
     history = model.fit(
         train_generator,
         steps_per_epoch=20,
-        epochs=5,
+        epochs=1,
         validation_data=validation_generator,
-        validation_steps=8,
+        validation_steps=2,
         verbose=2,
         #callbacks=my_callbacks
         )
 
     # save the model
-    model.save("model.h5")
+    model.save(caminho)
 
-    return model
+    return history
 
